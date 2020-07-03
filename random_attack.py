@@ -121,7 +121,7 @@ def main():
             fmodel = fmodel.transform_bounds((0, 1))
             assert fmodel.bounds == (0, 1)
             images, labels = samples(fmodel, dataset='imagenet', batchsize=20)
-            batch = 1000  # number of random perturbations in each iteration
+            batch = 500  # number of random perturbations in each iteration
         else:
             examples = iter(test_loader)
             images, labels = examples.next()
