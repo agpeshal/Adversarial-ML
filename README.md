@@ -6,7 +6,7 @@
 
 ### MNIST
 
-Some successful adversarial attacks (19/100) with over one million attacks
+Some successful (19/100) adversarial attacks with over one million attacks
 
 Average $l_2$ distance between the original image and adversarial image here is 4.5
 
@@ -20,7 +20,7 @@ Average $l_2$ distance between the original image and adversarial image here is 
 
 ### ImageNet
 
-Some successful adversarial attacks (5/20) with just 10k attacks
+Some successful (5/20) adversarial attacks with just 10k attacks
 
 ![](Results/imagenet/10.png)|![](Results/imagenet/9.png)|![](Results/imagenet/8.png)![](Results/imagenet/7.png)| ![](Results/imagenet/6.png)
 
