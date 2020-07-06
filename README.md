@@ -8,9 +8,9 @@
 
 Robustness accuracy vs perturbation norm for different number of total queries
 
-![](Results/MNIST/Gaussian_Noise.png)
+![](Results/MNIST/Gaussian_Noise.png)|![](Results/MNIST/Uniform_Noise.png) |![](Results/MNIST/Uniform_Noise_Linf.png)
 
-![](Results/MNIST/Uniform_Noise.png)
+
 
 As expected, the accuracy decrease consistently with increase in norm and increase in queries.
 
