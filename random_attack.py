@@ -32,7 +32,8 @@ def get_perturbed_samples(base_image, size, std, device):
     perturbations.squeeze_(-1)
     base_image = base_image.unsqueeze(0)
     perturbations = perturbations.to(device)
-    perturbed_samples = torch.clamp(base_image.reshape((1, c, h, w)).add(perturbations), 0, 1)
+    perturbed_samples = base_image.reshape((1, c, h, w)).add(perturbations)
+    # perturbed_samples = torch.clamp(base_image.reshape((1, c, h, w)).add(perturbations), 0, 1)
     #
     # normalize = transforms.Compose(
     #     [transforms.ToPILImage(), transforms.ToTensor(),
@@ -157,6 +158,9 @@ def main():
 
                         if args.save_count:
                             index = success[0].item()
+                            print("Norm of image", torch.norm(base_image))
+                            print("Norm of added noise", torch.norm(perturbed_samples[index] - base_image))
+
                             adversarial_image = perturbed_samples[index].to("cpu")
                             if adversarial_image.shape[0] == 1:
                                 plt.imshow(adversarial_image[0], cmap='gray')
@@ -178,8 +182,6 @@ def main():
                         break
 
     print("Accuracy on perturbed samples", 100.0 * successful / total)
-
-    print("Average L2 norms of noise", fb.distances.l2(perturbed_samples[0], base_image))
 
 
 if __name__ == "__main__":
