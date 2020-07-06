@@ -43,7 +43,7 @@ def main():
         target_class = (labels + 7) % 10
         criterion = fb.criteria.TargetedMisclassification(target_class)
     else:
-        criterion = fb.criteria.Misclassification()
+        criterion = fb.criteria.Misclassification(labels)
 
     attack = fa.HopSkipJumpAttack(iterations=args.iterations, initial_num_evals=args.initial_evals,
                      max_num_evals=args.max_evals)

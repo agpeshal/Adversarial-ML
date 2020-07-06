@@ -37,7 +37,7 @@ def main():
         target_class = (labels + 7) % 10
         criterion = fb.criteria.TargetedMisclassification(target_class)
     else:
-        criterion = fb.criteria.Misclassification()
+        criterion = fb.criteria.Misclassification(labels)
 
     attack = fa.BoundaryAttack(steps=args.steps)
     epsilons = np.linspace(0.01, 10, 20)
