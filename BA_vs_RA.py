@@ -4,7 +4,6 @@ import argparse
 import eagerpy as ep
 import foolbox.attacks as fa
 from foolbox import PyTorchModel, accuracy, samples
-import foolbox as fb
 import matplotlib.pyplot as plt
 
 from mnist_cnn import Net
@@ -12,7 +11,7 @@ from mnist_cnn import Net
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--steps', type=int, default=20000,
+    parser.add_argument('--steps', type=int, default=10000,
                         help='Iteration of BA')
     parser.add_argument('--targeted', action='store', default=False,
                         help='For targeted attack')
@@ -32,36 +31,27 @@ def main():
     images, labels = ep.astensors(*samples(fmodel, dataset="mnist", batchsize=10))
 
     print('Model accuracy on clean examples: {}'.format(accuracy(fmodel, images, labels)))
-
-    if args.targeted:
-        target_class = (labels + 7) % 10
-        criterion = fb.criteria.TargetedMisclassification(target_class)
-    else:
-        criterion = fb.criteria.Misclassification(labels)
-
-
-    attack = fa.BoundaryAttack(steps=args.steps, tensorboard=None)
     epsilons = np.linspace(0.01, 10, 20)
-    raw, clipped, success = attack(fmodel, images, labels,
+
+    boundary_attack = fa.BoundaryAttack(steps=args.steps, tensorboard=None)
+    _, _, ba_success = boundary_attack(fmodel, images, labels,
                                    epsilons=epsilons)
 
-    robust_accuracy = 1 - success.float32().mean(axis=-1)
+    ba_robust_accuracy = 1 - ba_success.float32().mean(axis=-1)
 
-    plt.plot(epsilons, robust_accuracy.numpy())
-    plt.xlabel("Epsilons")
+    random_attack = fa.L2RepeatedAdditiveGaussianNoiseAttack(repeats=args.steps)
+    _, _, ra_success = random_attack(fmodel, images, labels,
+                              epsilons=epsilons)
+    ra_robust_accuracy = 1 - ra_success.float32().mean(axis=-1)
+
+    legends = ["Boundary Attack", "Random Attack"]
+    plt.plot(epsilons, ba_robust_accuracy.numpy())
+    plt.plot(epsilons, ra_robust_accuracy.numpy())
+    plt.legend(legends, loc='upper right')
+    plt.xlabel("Perturbation Norm (L2)")
     plt.ylabel("Robust Accuracy")
-    plt.savefig('mnist_BA_robust_acc.jpg')
-    plt.show()
-
-    mean_distance = []
-    for i in range(len(clipped)):
-        dist = np.mean(fb.distances.l2(clipped[i], images).numpy())
-        mean_distance.append(dist)
-
-    plt.plot(epsilons, mean_distance)
-    plt.xlabel('Epsilons')
-    plt.ylabel('Mean L2 distance')
-    plt.savefig("mnist_BA_mean_L2distance.jpg")
+    plt.title("{} Queries".format(args.steps))
+    plt.savefig('mnist_robust_acc.jpg')
     plt.show()
 
 if __name__ == '__main__':
